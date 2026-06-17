@@ -2,7 +2,7 @@ import typer
 from typing_extensions import Annotated
 
 
-def greet(
+def weather(
     name: Annotated[
         str,
         typer.Argument(
