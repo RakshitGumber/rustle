@@ -1,7 +1,7 @@
 [project]
 name = "rustle"
 version = "0.1.0"
-description = "Add your description here"
+description = "CLI utilities"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -10,4 +10,7 @@ dependencies = [
 ]
 
 [project.scripts]
-greet = "greetings.cli:app"
+rustle = "apps.cli.main:start"
+
+[tool.setuptools.packages.find]
+include = ["apps*", "functions*"]
