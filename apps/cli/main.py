@@ -48,9 +48,9 @@ def status():
 
 
 @weather_app.command()
-def current():
+def current(city: str = typer.Option("Delhi", "--city", "-c")):
     try:
-        url = f"{BASE_URL}/current.json?key={WEATHER_API}&q=delhi&aqi=no"
+        url = f"{BASE_URL}/current.json?key={WEATHER_API}&q={city}&aqi=no"
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
