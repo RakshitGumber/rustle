@@ -10,10 +10,14 @@ import os
 from rich.console import Console
 from rich.panel import Panel
 
-console = Console()
 
 from rich.table import Table
 
+import tempfile
+import webbrowser
+from pathlib import Path
+
+console = Console()
 load_dotenv()
 
 WEATHER_API = os.getenv("WEATHER_API")
@@ -79,6 +83,86 @@ def display_weather(data):
     table.add_row("🌧 Rain Chance", f'{current["chance_of_rain"]}%')
 
     console.print(table)
+
+
+@weather_app.command()
+def open(city: str = "Delhi"):
+
+    url = f"{BASE_URL}/current.json?key={WEATHER_API}&q={city}&aqi=no"
+    data = requests.get(url).json()
+
+    current = data["current"]
+    location = data["location"]
+
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Rustle Weather</title>
+
+        <style>
+        body {{
+            background:#111827;
+            color:white;
+            font-family:sans-serif;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+        }}
+
+        .card {{
+            background:#1f2937;
+            padding:40px;
+            border-radius:20px;
+            width:400px;
+        }}
+
+        h1 {{
+            color:#60a5fa;
+        }}
+
+        .row {{
+            margin:15px 0;
+        }}
+        </style>
+    </head>
+
+    <body>
+
+    <div class="card">
+
+        <h1>🌤 Rustle Weather</h1>
+
+        <h2>{location["name"]}</h2>
+
+        <div class="row">
+            Temperature: {current["temp_c"]}°C
+        </div>
+
+        <div class="row">
+            Condition: {current["condition"]["text"]}
+        </div>
+
+        <div class="row">
+            Humidity: {current["humidity"]}%
+        </div>
+
+        <div class="row">
+            Wind: {current["wind_kph"]} km/h
+        </div>
+
+    </div>
+
+    </body>
+    </html>
+    """
+
+    file = Path(tempfile.gettempdir()) / "rustle_weather.html"
+
+    file.write_text(html, encoding="utf-8")
+
+    webbrowser.open(file.as_uri())
 
 
 @health_app.command()
