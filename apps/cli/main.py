@@ -2,6 +2,8 @@ import logging
 from collections import deque
 import requests
 
+from pyfiglet import Figlet
+
 from dotenv import load_dotenv
 import os
 
@@ -79,11 +81,8 @@ def display_weather(data):
     console.print(table)
 
 
-@app.command()
+@health_app.command()
 def logs(lines: int = 20):
-    """
-    Show the last N lines from the log file.
-    """
     try:
         with open(LOG_FILE, "r") as f:
             last_lines = deque(f, maxlen=lines)
@@ -97,6 +96,61 @@ def logs(lines: int = 20):
 
 app.add_typer(health_app, name="health")
 app.add_typer(weather_app, name="weather")
+
+
+def show_banner():
+    fig = Figlet(font="slant")
+    banner = fig.renderText("Rustle")
+
+    console.print(f"[bold cyan]{banner}[/bold cyan]")
+
+
+def show_help():
+
+    show_banner()
+
+    console.print(
+        Panel.fit(
+            "[bold]Rustle[/bold]\n" "RSS Feed Engine & Utility Toolkit",
+            border_style="cyan",
+        )
+    )
+
+    commands = Table(title="Commands", show_header=True, header_style="bold cyan")
+
+    commands.add_column("Command")
+    commands.add_column("Description")
+
+    commands.add_row("weather current", "Current weather information")
+
+    commands.add_row("health status", "Check application health")
+
+    commands.add_row("health logs", "View recent logs")
+
+    console.print(commands)
+
+    console.print()
+
+    examples = Table(title="Examples", show_header=False)
+
+    examples.add_row("[green]rustle weather current[/green]", "Delhi weather")
+
+    examples.add_row(
+        "[green]rustle weather current -c Mumbai[/green]", "Mumbai weather"
+    )
+
+    examples.add_row("[green]rustle health logs[/green]", "Last 20 logs")
+
+    console.print(examples)
+
+
+@app.callback(invoke_without_command=True)
+def main(
+    ctx: typer.Context, help: bool = typer.Option(None, "--help", "-h", is_eager=True)
+):
+    if ctx.invoked_subcommand is None:
+        show_help()
+
 
 if __name__ == "__main__":
     app()
