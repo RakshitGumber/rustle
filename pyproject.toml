@@ -10,7 +10,4 @@ dependencies = [
 ]
 
 [project.scripts]
-rustle = "apps.cli.main:app"
-
-[tool.setuptools.packages.find]
-include = ["apps*", "functions*"]
+rustle = "main:app"
