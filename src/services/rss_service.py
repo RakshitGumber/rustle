@@ -8,16 +8,22 @@ sources = [
 ]
 
 
+headers = {"User-Agent": "Rustle/1.0"}
+
+
 def fetch_part():
     for url in sources:
-        response = requests.get(url)
-
-        if response.status_code == 200:
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
             yield response
-        else:
-            print(f"Failed: {url}")
+
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to fetch {url}: {e}")
+            continue
 
 
 if __name__ == "__main__":
-    for feed in fetch_part():
-        print(feed.text)
+    with open("rss.xml", "w", encoding="utf-8") as file:
+        for feed in fetch_part():
+            file.write(feed.text)
